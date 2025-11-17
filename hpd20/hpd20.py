@@ -1,7 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+HPD-20 Editor - Core module for Roland HandSonic HPD-20 patch editor
 
-
+This module provides the main business logic for loading, editing, and saving
+HPD-20 memory dumps (.HS0 files).
+"""
 
 
 from os import mkdir
@@ -51,8 +55,8 @@ class hpd:
 
     def __init__(self, file_name):
         print("loading file {0}".format(file_name))
-        fh = file(file_name, 'rb')
-        memory_block = bytearray(fh.read())
+        with open(file_name, 'rb') as fh:
+            memory_block = bytearray(fh.read())
         self.md5_memory = memory_block[-16:]
         print(" ".join(hex(n) for n in self.md5_memory))
 
@@ -89,38 +93,38 @@ class hpd:
 
     def save_file(self, file_name):
         m = hashlib.md5()
-        m.update(str(self.memoryBlock))
+        m.update(bytes(self.memoryBlock))
         md5_digest = m.digest()
-        fh = file(file_name, 'wb')
-        fh.write(self.memoryBlock)
-        print(" ".join(hex(ord(n)) for n in md5_digest))
-        fh.write(md5_digest)
+        with open(file_name, 'wb') as fh:
+            fh.write(self.memoryBlock)
+            print(" ".join(hex(n) for n in md5_digest))
+            fh.write(md5_digest)
 
     def save_kit(self, kit_index, file_name, inc_filename_ifexists=False):
         try:
             if inc_filename_ifexists:
                 pass
 
-            fh = file(file_name, 'wb')
-            kit = self.kits.get_kit(kit_index)
-            kit.save(fh)
-            for pad_index in range(hpd.PADS_PER_KIT):
-                pad = self.pads.get_pad(hpd.PADS_PER_KIT * kit_index + pad_index)
-                pad.save(fh)
+            with open(file_name, 'wb') as fh:
+                kit = self.kits.get_kit(kit_index)
+                kit.save(fh)
+                for pad_index in range(hpd.PADS_PER_KIT):
+                    pad = self.pads.get_pad(hpd.PADS_PER_KIT * kit_index + pad_index)
+                    pad.save(fh)
         except Exception as e:
             print("Exception {0}".format(e))
 
     def load_kit(self, kit_index, file_name):
         try:
-            fh = file(file_name, 'rb')
-            kit = self.kits.get_kit(kit_index)
-            kit.load(fh)
-            for pad_index in range(hpd.PADS_PER_KIT):
-                final_pad_index = hpd.PADS_PER_KIT * kit_index + pad_index
-                pad = self.pads.get_pad(final_pad_index)
-                pad.load(fh)
-                self.memoryBlock[hpd.PAD_MEMINDEX + hpd.PAD_MEMSIZE * final_pad_index:hpd.PAD_MEMINDEX + hpd.PAD_MEMSIZE * (final_pad_index + 1)] = pad.memory_block
-            self.memoryBlock[hpd.KIT_MEMINDEX + hpd.KIT_MEMSIZE * kit_index:hpd.KIT_MEMINDEX + hpd.KIT_MEMSIZE * (kit_index + 1)] = kit.memory_block
+            with open(file_name, 'rb') as fh:
+                kit = self.kits.get_kit(kit_index)
+                kit.load(fh)
+                for pad_index in range(hpd.PADS_PER_KIT):
+                    final_pad_index = hpd.PADS_PER_KIT * kit_index + pad_index
+                    pad = self.pads.get_pad(final_pad_index)
+                    pad.load(fh)
+                    self.memoryBlock[hpd.PAD_MEMINDEX + hpd.PAD_MEMSIZE * final_pad_index:hpd.PAD_MEMINDEX + hpd.PAD_MEMSIZE * (final_pad_index + 1)] = pad.memory_block
+                self.memoryBlock[hpd.KIT_MEMINDEX + hpd.KIT_MEMSIZE * kit_index:hpd.KIT_MEMINDEX + hpd.KIT_MEMSIZE * (kit_index + 1)] = kit.memory_block
         except Exception as e:
             print("Exception {0}".format(e))
 

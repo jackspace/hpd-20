@@ -1,9 +1,9 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
 # http://jenyay.net/Programming/WxSizer
-import ConfigParser
+import configparser
 import os
 import wx
 import wx.grid as gridlib
@@ -19,7 +19,7 @@ wx.SetDefaultPyEncoding('utf-8')
 class HpdForm(wx.Frame):
 
     def load_config(self):
-        self.config = ConfigParser.RawConfigParser()
+        self.config = configparser.RawConfigParser()
         self.config.add_section('Settings')
         self.config_filename = os.path.expanduser('~/.hpd.cfg')
         try:
@@ -27,7 +27,7 @@ class HpdForm(wx.Frame):
             self.default_kits_dir = self.config.get('Settings', 'kits_directory')
             self.default_backup_dir = self.config.get('Settings', 'backup_directory')
             self.current_kit = self.config.getint('Settings', 'current_kit')
-        except:
+        except Exception:
             pass
 
     def __init__(self, file_name):

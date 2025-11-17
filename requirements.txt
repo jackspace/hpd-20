@@ -1,0 +1,13 @@
+# HPD-20 Editor - Runtime Dependencies
+# Python 3.8+ required
+
+# Configuration management (Python 3 compatible)
+configparser>=5.3.0
+
+# GUI Framework
+# Note: wxPython requires manual installation on some systems
+# Install with: pip install wxPython
+# Commented out to avoid installation issues on headless systems
+# wxPython>=4.2.0
+
+# No other runtime dependencies required

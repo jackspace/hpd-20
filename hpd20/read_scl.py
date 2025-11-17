@@ -1,12 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
 
 
 def read_scale(file_name):
-    fh = file(file_name, "r")
-    text = fh.read()
+    with open(file_name, "r") as fh:
+        text = fh.read()
     lines = text.splitlines()
     state = 0
     items = [1.0]
